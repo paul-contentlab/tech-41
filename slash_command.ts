@@ -1,23 +1,10 @@
 import { REST, Routes, ApplicationCommandOptionType } from "discord.js";
 import { DiscordIds } from "../enums/enums";
+import { Command } from "./types";
 
 const CL_BOT_CLIENT_ID = DiscordIds.contentLabClient;
 const TEST_BOT_CLIENT_ID = DiscordIds.testClient;
 const serverToken = process.env.TOKEN;
-
-interface Command {
-  name: string;
-  description: string;
-  options?: CommandOption[];
-}
-
-interface CommandOption {
-  name: string;
-  type: ApplicationCommandOptionType;
-  description: string;
-  required: boolean;
-  choices?: { name: string; value: string }[];
-}
 
 async function registerSlashCommand(): Promise<void> {
   const commands: Command[] = [
