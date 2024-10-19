@@ -16,6 +16,7 @@ import {
   testContentDb,
   googleSheetsPromise,
 } from "cl-shared-library/index";
+import { NamedRangeDetails } from "./types";
 
 const Campaign = getCampaignModel(testContentDb);
 
@@ -38,7 +39,7 @@ async function wrapCampaign(interaction: ButtonInteraction): Promise<void> {
 }
 
 async function handleWrapCampaignInteraction(
-  interaction: ButtonInteraction,
+  interaction: ButtonInteraction | ModalSubmitInteraction,
 ): Promise<void> {
   if (interaction.isButton() && interaction.customId.startsWith("wrap_")) {
     switch (interaction.customId) {
@@ -127,7 +128,7 @@ async function handleKpiAccurate(
     "bonusVariable",
   );
 
-  const row = new ActionRowBuilder().addComponents(
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId("wrap_no_bonus_kpi")
       .setLabel("NO")
@@ -180,7 +181,7 @@ async function showBonusReasonModal(
 }
 
 async function handleBonusReasonModalSubmit(
-  interaction: ButtonInteraction,
+  interaction: ModalSubmitInteraction,
 ): Promise<void> {
   const reason = interaction.fields.getTextInputValue("bonusReason");
   const userName = interaction.user.username; // Get the full name of the user who runs the command
@@ -218,7 +219,10 @@ async function handleBonusReasonModalSubmit(
 }
 
 // Helpers
-async function isBonusUnlocked(spreadsheetId: any, rangeName: string) {
+async function isBonusUnlocked(
+  spreadsheetId: any,
+  rangeName: string,
+): Promise<boolean> {
   const googleSheets = await googleSheetsPromise;
   try {
     const response = await googleSheets.spreadsheets.values.get({
@@ -241,7 +245,7 @@ async function isBonusUnlocked(spreadsheetId: any, rangeName: string) {
 async function getNamedRangeDetails(
   spreadsheetId: any,
   namedRangeName: string,
-) {
+): Promise<NamedRangeDetails> {
   const googleSheets = await googleSheetsPromise;
   try {
     const response = await googleSheets.spreadsheets.get({
@@ -288,7 +292,7 @@ async function setCellNote(
     endColumnIndex: any;
   },
   note: string,
-) {
+): Promise<void> {
   console.log("note:");
   console.log(note);
   const googleSheets = await googleSheetsPromise;
